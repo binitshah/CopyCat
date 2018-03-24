@@ -1,0 +1,86 @@
+{
+	"phrase_metadata": {
+		"version": "1.0",
+		"min_phrase_length": "3",
+		"max_phrase_length": "5",
+		"total_num_phrases": "58"
+	},
+	"data": {
+		"3-word": {
+			"num_phrases": "20",
+			"format": "subject_preposition_objofpreposition",
+			"phrases": [
+				"alligator_above_chair",
+				"alligator_above_wall",
+				"alligator_above_bed",
+				"lion_above_bed",
+				"lion_above_box",
+				"lion_above_flowers",
+				"lion_above_wall",
+				"snake_above_wall",
+				"snake_above_box",
+				"monkey_above_chair",
+				"monkey_above_wall",
+				"alligator_in_box",
+				"alligator_in_wagon",
+				"snake_in_flowers",
+				"monkey_in_box",
+				"lion_below_chair",
+				"snake_below_bed",
+				"snake_below_chair",
+				"monkey_below_bed",
+				"monkey_below_wagon"
+			]
+		},
+		"4-word": {
+			"num_phrases": "20",
+			"format": "subject_preposition_adjective_objofpreposition",
+			"phrases": [
+				"alligator_above_black_wall",
+				"alligator_above_orange_wagon",
+				"alligator_above_blue_wagon",
+				"alligator_above_blue_wall",
+				"lion_above_orange_bed",
+				"lion_above_blue_bed",
+				"lion_above_grey_wall",
+				"monkey_above_white_wall",
+				"alligator_in_orange_flowers",
+				"snake_in_grey_wagon",
+				"monkey_in_blue_box",
+				"monkey_in_grey_box",
+				"monkey_in_orange_flowers",
+				"alligator_below_grey_bed",
+				"lion_below_blue_bed",
+				"lion_below_orange_chair",
+				"snake_below_black_chair",
+				"snake_below_blue_chair",
+				"snake_below_blue_flowers",
+				"monkey_below_blue_chair"
+			]
+		},
+		"5-word": {
+			"num_phrases": "18",
+			"format": "adjective_subject_preposition_adjective_objofpreposition",
+			"phrases": [
+				"black_alligator_above_orange_wagon",
+				"black_lion_above_grey_bed",
+				"blue_alligator_above_grey_wall",
+				"blue_monkey_above_grey_box",
+				"white_lion_above_orange_wall",
+				"white_alligator_above_blue_wall",
+				"black_lion_in_blue_wagon",
+				"black_monkey_in_white_flowers",
+				"orange_alligator_in_grey_flowers",
+				"orange_monkey_in_grey_box",
+				"white_snake_in_blue_flowers",
+				"white_lion_in_grey_box",
+				"black_snake_below_blue_chair",
+				"grey_alligator_below_blue_flowers",
+				"grey_snake_below_blue_chair",
+				"grey_monkey_below_orange_chair",
+				"orange_snake_below_blue_flowers",
+				"orange_monkey_below_grey_flowers"
+			]
+		}
+	}
+}

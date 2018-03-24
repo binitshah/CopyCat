@@ -1,0 +1,37 @@
+{
+	"phrase_metadata": {
+		"version": "1.1",
+		"min_phrase_length": "3",
+		"max_phrase_length": "5",
+		"total_num_phrases": "9"
+	},
+	"data": {
+		"3-word": {
+			"num_phrases": "3",
+			"format": "subject_preposition_objofpreposition",
+			"phrases": [
+				"alligator_above_chair",
+				"alligator_in_box",
+				"monkey_below_wagon"
+			]
+		},
+		"4-word": {
+			"num_phrases": "3",
+			"format": "subject_preposition_adjective_objofpreposition",
+			"phrases": [
+				"lion_above_grey_wall",
+				"snake_in_grey_wagon",
+				"monkey_below_blue_chair"
+			]
+		},
+		"5-word": {
+			"num_phrases": "3",
+			"format": "adjective_subject_preposition_adjective_objofpreposition",
+			"phrases": [
+				"white_lion_above_orange_wall",
+				"orange_monkey_in_grey_box",
+				"orange_snake_below_blue_flowers"
+			]
+		}
+	}
+}
