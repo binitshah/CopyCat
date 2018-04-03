@@ -106,11 +106,10 @@ public class LevelLoader : MonoBehaviour {
 		foreach (Transform child in this.enemyAndItemRenderer.transform) {
 			GameObject.Destroy(child.gameObject);
 		}
-		UnityEngine.Object enemyAndItemPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/" + this.currPhrase + ".prefab", typeof(GameObject));
-//		UnityEngine.Object enemyAndItemPrefab = Resources.Load("Prefabs/" + this.currPhrase + ".prefab", typeof(GameObject));
-//		if (enemyAndItemPrefab == null) {
-//			throw new NullReferenceException("Could not find enemyAndItem prefab.");
-//		}
+		UnityEngine.Object enemyAndItemPrefab = Resources.Load("Prefabs/" + this.currPhrase, typeof(GameObject));
+		if (enemyAndItemPrefab == null) {
+			throw new NullReferenceException("Could not find enemyAndItem prefab.");
+		}
 		GameObject enemyAndItem = Instantiate(enemyAndItemPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 		enemyAndItem.transform.parent = this.enemyAndItemRenderer.transform;
 		enemyAndItem.transform.position = this.enemyAndItemRenderer.transform.position;
@@ -131,18 +130,20 @@ public class LevelLoader : MonoBehaviour {
 			hintVideoPlayer.source = VideoSource.VideoClip;
 			hintVideoPlayer.isLooping = false;
 			hintVideoPlayer.audioOutputMode = VideoAudioOutputMode.None;
-			VideoClip hintVideo = (VideoClip) AssetDatabase.LoadAssetAtPath("Assets/Videos/Hints/" + currPhrase + ".mp4", typeof(VideoClip));
+			VideoClip hintVideo = (VideoClip) Resources.Load("Videos/Hints/" + currPhrase, typeof(VideoClip));
+			if (hintVideo == null) {
+				throw new NullReferenceException("Could not find hint video.");
+			}
 			hintVideoPlayer.clip = hintVideo;
 
 			// Load iris
 			foreach (Transform child in this.irisRenderer.transform) {
 				GameObject.Destroy(child.gameObject);
 			}
-			UnityEngine.Object irisMiaoPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/cat_miao.prefab", typeof(GameObject));
-//			UnityEngine.Object irisMiaoPrefab = Resources.Load("Prefabs/cat_miao.prefab", typeof(GameObject));
-//			if (irisMiaoPrefab == null) {
-//				throw new NullReferenceException("Could not find irisMiaos prefab.");
-//			}
+			UnityEngine.Object irisMiaoPrefab = Resources.Load("Prefabs/cat_miao", typeof(GameObject));
+			if (irisMiaoPrefab == null) {
+				throw new NullReferenceException("Could not find irisMiaos prefab.");
+			}
 			GameObject irisMiao = Instantiate(irisMiaoPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 			irisMiao.transform.parent = this.irisRenderer.transform;
 			irisMiao.transform.position = this.irisRenderer.transform.position;
@@ -174,8 +175,14 @@ public class LevelLoader : MonoBehaviour {
 					nextBackgroundRoom += "middle";
 				}
 			}
-			Sprite currBackgroundRoomSprite = (Sprite) AssetDatabase.LoadAssetAtPath("Assets/Graphics/Rooms/" + currBackgroundRoom + ".png", typeof(Sprite));
-			Sprite nextBackgroundRoomSprite = (Sprite) AssetDatabase.LoadAssetAtPath("Assets/Graphics/Rooms/" + nextBackgroundRoom + ".png", typeof(Sprite));
+			Sprite currBackgroundRoomSprite = (Sprite) Resources.Load("Graphics/Rooms/" + currBackgroundRoom, typeof(Sprite));
+			if (currBackgroundRoomSprite == null) {
+				throw new NullReferenceException("Could not find background sprite.");
+			}
+			Sprite nextBackgroundRoomSprite = (Sprite) Resources.Load("Graphics/Rooms/" + nextBackgroundRoom, typeof(Sprite));
+			if (nextBackgroundRoomSprite == null) {
+				throw new NullReferenceException("Could not find background sprite.");
+			}
 			SpriteRenderer currBackgroundSpriteRenderer = this.currBackgroundRenderer.GetComponent<SpriteRenderer>();
 			SpriteRenderer nextBackgroundSpriteRenderer = this.nextBackgroundRenderer.GetComponent<SpriteRenderer>();
 			currBackgroundSpriteRenderer.sprite = currBackgroundRoomSprite;
@@ -197,7 +204,10 @@ public class LevelLoader : MonoBehaviour {
 			foreach (Transform child in this.irisRenderer.transform) {
 				GameObject.Destroy(child.gameObject);
 			}
-			UnityEngine.Object irisOneHandPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/scratch_onehand.prefab", typeof(GameObject));
+			UnityEngine.Object irisOneHandPrefab = Resources.Load("Prefabs/scratch_onehand", typeof(GameObject));
+			if (irisOneHandPrefab == null) {
+				throw new NullReferenceException("Could not find irisOneHand prefab.");
+			}
 			GameObject irisOneHand = Instantiate(irisOneHandPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 			irisOneHand.transform.parent = this.irisRenderer.transform;
 			irisOneHand.transform.position = this.irisRenderer.transform.position;
@@ -216,7 +226,10 @@ public class LevelLoader : MonoBehaviour {
 						foreach (Transform child in this.magicsRenderer.transform) {
 							GameObject.Destroy(child.gameObject);
 						}
-						UnityEngine.Object magicsFailedPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/magics_failed.prefab", typeof(GameObject));
+						UnityEngine.Object magicsFailedPrefab = Resources.Load("Prefabs/magics_failed", typeof(GameObject));
+						if (magicsFailedPrefab == null) {
+							throw new NullReferenceException("Could not find magics_failed prefab.");
+						}
 						GameObject magicsFailed = Instantiate(magicsFailedPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 						magicsFailed.transform.parent = this.magicsRenderer.transform;
 						magicsFailed.transform.position = this.magicsRenderer.transform.position;
@@ -231,7 +244,10 @@ public class LevelLoader : MonoBehaviour {
 				foreach (Transform child in this.irisRenderer.transform) {
 					GameObject.Destroy(child.gameObject);
 				}
-				UnityEngine.Object irisMiaoPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/cat_miao.prefab", typeof(GameObject));
+				UnityEngine.Object irisMiaoPrefab = Resources.Load("Prefabs/cat_miao", typeof(GameObject));
+				if (irisMiaoPrefab == null) {
+					throw new NullReferenceException("Could not find cat_miao prefab.");
+				}
 				GameObject irisMiao = Instantiate(irisMiaoPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 				irisMiao.transform.parent = this.irisRenderer.transform;
 				irisMiao.transform.position = this.irisRenderer.transform.position;
@@ -243,7 +259,10 @@ public class LevelLoader : MonoBehaviour {
 			foreach (Transform child in this.irisRenderer.transform) {
 				GameObject.Destroy(child.gameObject);
 			}
-			UnityEngine.Object irisTwoHandsPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/scratch_twohands.prefab", typeof(GameObject));
+			UnityEngine.Object irisTwoHandsPrefab = Resources.Load("Prefabs/scratch_twohands", typeof(GameObject));
+			if (irisTwoHandsPrefab == null) {
+				throw new NullReferenceException("Could not find scratch_twohands prefab.");
+			}
 			GameObject irisTwoHands = Instantiate(irisTwoHandsPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 			irisTwoHands.transform.parent = this.irisRenderer.transform;
 			irisTwoHands.transform.position = this.irisRenderer.transform.position;
@@ -262,7 +281,10 @@ public class LevelLoader : MonoBehaviour {
 						foreach (Transform child in this.magicsRenderer.transform) {
 							GameObject.Destroy(child.gameObject);
 						}
-						UnityEngine.Object magicsPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/magics.prefab", typeof(GameObject));
+						UnityEngine.Object magicsPrefab = Resources.Load("Prefabs/magics", typeof(GameObject));
+						if (magicsPrefab == null) {
+							throw new NullReferenceException("Could not find magics prefab.");
+						}
 						GameObject magics = Instantiate(magicsPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 						magics.transform.parent = this.magicsRenderer.transform;
 						magics.transform.position = this.magicsRenderer.transform.position;
@@ -277,7 +299,10 @@ public class LevelLoader : MonoBehaviour {
 				foreach (Transform child in this.irisRenderer.transform) {
 					GameObject.Destroy(child.gameObject);
 				}
-				UnityEngine.Object irisWalkPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/cat_walk.prefab", typeof(GameObject));
+				UnityEngine.Object irisWalkPrefab = Resources.Load("Prefabs/cat_walk", typeof(GameObject));
+				if (irisWalkPrefab == null) {
+					throw new NullReferenceException("Could not find cat_walk prefab.");
+				}
 				GameObject irisWalk = Instantiate(irisWalkPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 				irisWalk.transform.parent = this.irisRenderer.transform;
 				irisWalk.transform.position = this.irisRenderer.transform.position;
@@ -288,7 +313,10 @@ public class LevelLoader : MonoBehaviour {
 				}
 				this.currPhrase = PhraseChooser();
 				if (this.currPhrase != null) {
-					UnityEngine.Object enemyAndItemPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/" + this.currPhrase + ".prefab", typeof(GameObject));
+					UnityEngine.Object enemyAndItemPrefab = Resources.Load("Prefabs/" + this.currPhrase, typeof(GameObject));
+					if (enemyAndItemPrefab == null) {
+						throw new NullReferenceException("Could not find enemyAndItem prefab.");
+					}
 					GameObject enemyAndItem = Instantiate(enemyAndItemPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 					enemyAndItem.transform.parent = this.enemyAndItemRenderer.transform;
 					Vector3 enemyAndItemPosition = this.enemyAndItemRenderer.transform.position;
