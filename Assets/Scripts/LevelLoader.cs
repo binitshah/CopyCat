@@ -10,7 +10,7 @@ using SimpleJSON;
 public class LevelLoader : MonoBehaviour {
 
 	public bool debugMode = false;
-	static public int currLevel = 1;
+	static public int currLevel = 2;
 	public string currPhrase;
 	public TextAsset phrasesJSONFile;
 	public GameObject hintVideoRenderer;
@@ -18,8 +18,15 @@ public class LevelLoader : MonoBehaviour {
 	public GameObject irisRenderer;
 	public GameObject magicsRenderer;
 	public GameObject enemyAndItemRenderer;
+	public GameObject originalEnemyRenderer;
+	public GameObject originalItemRenderer;
+	public GameObject originalsRenderer;
+	public GameObject starRenderer;
 	public GameObject currBackgroundRenderer;
 	public GameObject nextBackgroundRenderer;
+	public GameObject hintButtonTextRenderer;
+	public GameObject signButtonTextRenderer;
+	public UnityEngine.UI.Text pointCounterText;
 
 	private List<string> usedPhrases;
 	private List<string> unusedPhrases;
@@ -37,12 +44,12 @@ public class LevelLoader : MonoBehaviour {
 		Exiting
 	};
 	private LevelState currLevelState;
-	private string currPhraseFormat;
 	private float countdown;
+	private int points = 0;
 	private Vector3 currBackgroundInitPosition;
 	private Vector3 nextBackgroundInitPosition;
 	private Vector3 irisInitPosition;
-	private Vector3 enemyAndItemInitPosition;
+	private Vector3 enemyAndItemAndStarInitPosition;
 
 	// public event functions
 	public void PlayHint() {
@@ -52,24 +59,29 @@ public class LevelLoader : MonoBehaviour {
 			hintVideoPlayer.frame = 1;
 			hintVideoPlayer.Play();
 		} else {
-			hintVideoRenderer.SetActive(true);
-			hintVideoPlayer.Play();
-			hintVideoPlayer.loopPointReached += HintVideoEndReached;
+//			hintVideoRenderer.SetActive(true);
+			if (currLevelState < LevelState.Evaluating) {
+				hintVideoPlayer.Play();
+				hintVideoPlayer.loopPointReached += HintVideoEndReached;
+			}
 		}
 	}
 
-	public void ShowSigningFeed() {
+	public void StartSigning() {
 		VideoPlayer hintVideoPlayer = hintVideoRenderer.GetComponent<VideoPlayer>();
 		if (hintVideoPlayer.isPlaying) {
-			hintVideoPlayer.Stop();
+			hintVideoPlayer.Pause();
 		}
-		hintVideoRenderer.SetActive(false);
-		if (signingVideoRenderer.activeInHierarchy) {
-			signingVideoRenderer.SetActive(false);
+//		hintVideoRenderer.SetActive(false);
+//		if (signingVideoRenderer.activeInHierarchy) {
+//			signingVideoRenderer.SetActive(false);
+//			currLevelState = LevelState.Evaluating;
+//		} else {
+//			signingVideoRenderer.SetActive(true);
+//			currLevelState = LevelState.Listening;
+//		}
+		if (currLevelState < LevelState.Evaluating) {
 			currLevelState = LevelState.Evaluating;
-		} else {
-			signingVideoRenderer.SetActive(true);
-			currLevelState = LevelState.Listening;
 		}
 	}
 
@@ -92,12 +104,12 @@ public class LevelLoader : MonoBehaviour {
 		for (int i = 0; i < json["data"][phraseLength + "-word"]["phrases"].Count; i++) {
 			this.unusedPhrases.Add(json["data"][phraseLength + "-word"]["phrases"][i]);
 		}
-		this.currPhraseFormat = json["data"][phraseLength + "-word"]["format"];
 		this.usedPhrases = new List<string>();
+		this.phraseMetaData.Add("partsOfSpeech", json["data"][phraseLength + "-word"]["format"]);
 
 		// load current phrase
 		this.currPhrase = PhraseChooser();
-		if (currPhrase == null) {
+		if (this.currPhrase == null) {
 			Debug.Log("No Phrases available. Game quit.");
 			Application.Quit();
 		}
@@ -114,10 +126,57 @@ public class LevelLoader : MonoBehaviour {
 		enemyAndItem.transform.parent = this.enemyAndItemRenderer.transform;
 		enemyAndItem.transform.position = this.enemyAndItemRenderer.transform.position;
 
+		// Load original enemy and item into original section if greater than smallest level
+		foreach (Transform child in this.originalEnemyRenderer.transform) {
+			GameObject.Destroy(child.gameObject);
+		}
+		foreach (Transform child in this.originalItemRenderer.transform) {
+			GameObject.Destroy(child.gameObject);
+		}
+		int minLevel = Int32.Parse(this.phraseMetaData["minPhraseLength"]) - 2;
+		int maxLevel = Int32.Parse(this.phraseMetaData["maxPhraseLength"]) - 2;
+		if (currLevel > minLevel) {
+			string[] poss = this.phraseMetaData["partsOfSpeech"].Split('_');
+			string[] phraseWords = this.currPhrase.Split('_');
+			string enemy = null;
+			string item = null;
+			for (int i = 0; i < poss.Length; i++) {
+				if (poss[i].Equals("subject")) {
+					enemy = phraseWords[i];
+				}
+				if (poss[i].Equals("objofpreposition")) {
+					item = phraseWords[i];
+				}
+			}
+			if (enemy == null || item == null) {
+				throw new Exception("Unable to correctly parse currPhrase for enemy and/or item.");
+			} else {
+				UnityEngine.Object originalEnemyPrefab = Resources.Load("Prefabs/" + enemy, typeof(GameObject));
+				UnityEngine.Object originalItemPrefab = Resources.Load("Prefabs/" + item, typeof(GameObject));
+				if (originalEnemyPrefab == null || originalItemPrefab == null) {
+					throw new NullReferenceException("Could not find reference to enemy or item prefabs. Enemy: " + enemy + " | Item: " + item);
+				}
+				GameObject originalEnemy = Instantiate(originalEnemyPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+				GameObject originalItem = Instantiate(originalItemPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+				originalEnemy.transform.SetParent(this.originalEnemyRenderer.transform, false);
+				originalItem.transform.SetParent(this.originalItemRenderer.transform, false);
+			}
+			this.originalsRenderer.SetActive(true);
+		} else {
+			this.originalsRenderer.SetActive(false);
+		}
+
 		this.currBackgroundInitPosition = this.currBackgroundRenderer.transform.position;
 		this.nextBackgroundInitPosition = this.nextBackgroundRenderer.transform.position;
-		this.enemyAndItemInitPosition = this.enemyAndItemRenderer.transform.position;
+		this.enemyAndItemAndStarInitPosition = this.enemyAndItemRenderer.transform.position;
 		this.irisInitPosition = this.irisRenderer.transform.position;
+
+		// Change Hint and Sign Button's text to white if maxLevel
+		if (currLevel == maxLevel) {
+			hintButtonTextRenderer.GetComponentInChildren<UnityEngine.UI.Text>().color = new Color(255, 255, 255);
+			signButtonTextRenderer.GetComponentInChildren<UnityEngine.UI.Text>().color = new Color(255, 255, 255);
+			pointCounterText.color = new Color(255, 255, 255);
+		}
 
 		// start the game off by loading the right assets
 		this.currLevelState = LevelState.Loading;
@@ -135,6 +194,9 @@ public class LevelLoader : MonoBehaviour {
 				throw new NullReferenceException("Could not find hint video.");
 			}
 			hintVideoPlayer.clip = hintVideo;
+			hintVideoPlayer.Play();
+			hintVideoPlayer.Pause();
+			this.hintVideoRenderer.SetActive(true);
 
 			// Load iris
 			foreach (Transform child in this.irisRenderer.transform) {
@@ -188,8 +250,49 @@ public class LevelLoader : MonoBehaviour {
 			currBackgroundSpriteRenderer.sprite = currBackgroundRoomSprite;
 			nextBackgroundSpriteRenderer.sprite = nextBackgroundRoomSprite;
 
-			// Set enemy and item position since it's already been loaded
-			this.enemyAndItemRenderer.transform.position = enemyAndItemInitPosition;
+			// Set enemy and item position since it's already been loaded. also deal with star stuff
+			this.enemyAndItemRenderer.transform.position = enemyAndItemAndStarInitPosition;
+			this.starRenderer.transform.position = enemyAndItemAndStarInitPosition;
+			this.starRenderer.SetActive(true);
+
+			// Load original enemy and item into original section if greater than smallest level
+			foreach (Transform child in this.originalEnemyRenderer.transform) {
+				GameObject.Destroy(child.gameObject);
+			}
+			foreach (Transform child in this.originalItemRenderer.transform) {
+				GameObject.Destroy(child.gameObject);
+			}
+			int minLevel = Int32.Parse(this.phraseMetaData["minPhraseLength"]) - 2;
+			if (currLevel > minLevel) {
+				string[] poss = this.phraseMetaData["partsOfSpeech"].Split('_');
+				string[] phraseWords = this.currPhrase.Split('_');
+				string enemy = null;
+				string item = null;
+				for (int i = 0; i < poss.Length; i++) {
+					if (poss[i].Equals("subject")) {
+						enemy = phraseWords[i];
+					}
+					if (poss[i].Equals("objofpreposition")) {
+						item = phraseWords[i];
+					}
+				}
+				if (enemy == null || item == null) {
+					throw new Exception("Unable to correctly parse currPhrase for enemy and/or item.");
+				} else {
+					UnityEngine.Object originalEnemyPrefab = Resources.Load("Prefabs/" + enemy, typeof(GameObject));
+					UnityEngine.Object originalItemPrefab = Resources.Load("Prefabs/" + item, typeof(GameObject));
+					if (originalEnemyPrefab == null || originalItemPrefab == null) {
+						throw new NullReferenceException("Could not find reference to enemy or item prefabs. Enemy: " + enemy + " | Item: " + item);
+					}
+					GameObject originalEnemy = Instantiate(originalEnemyPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+					GameObject originalItem = Instantiate(originalItemPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+					originalEnemy.transform.SetParent(this.originalEnemyRenderer.transform, false);
+					originalItem.transform.SetParent(this.originalItemRenderer.transform, false);
+				}
+				this.originalsRenderer.SetActive(true);
+			} else {
+				this.originalsRenderer.SetActive(false);
+			}
 
 			this.currLevelState = LevelState.WaitingForAction;
 		}
@@ -329,6 +432,16 @@ public class LevelLoader : MonoBehaviour {
 		}
 
 		if (this.currLevelState == LevelState.Transitioning) {
+			// clear originals section and clear the hint video
+			foreach (Transform child in this.originalEnemyRenderer.transform) {
+				GameObject.Destroy(child.gameObject);
+			}
+			foreach (Transform child in this.originalItemRenderer.transform) {
+				GameObject.Destroy(child.gameObject);
+			}
+			this.originalsRenderer.SetActive(false);
+
+			// set moving
 			float transitionSpeed = 0.1f;
 			Vector3 currBackgroundPosition = this.currBackgroundRenderer.transform.position;
 			currBackgroundPosition.x -= transitionSpeed;
@@ -339,6 +452,17 @@ public class LevelLoader : MonoBehaviour {
 			Vector3 enemyAndItemPosition = this.enemyAndItemRenderer.transform.position;
 			enemyAndItemPosition.x -= transitionSpeed;
 			this.enemyAndItemRenderer.transform.position = enemyAndItemPosition;
+			Vector3 starPosition = this.starRenderer.transform.position;
+			if (this.starRenderer.transform.position.x > this.irisRenderer.transform.position.x + this.irisRenderer.transform.lossyScale.x / 2) {
+				starPosition.x -= transitionSpeed;
+				this.starRenderer.transform.position = starPosition;	
+			} else {
+				if (this.starRenderer.activeInHierarchy) {
+					this.starRenderer.SetActive(false);
+					this.points++;
+					this.pointCounterText.text = this.points + "x";
+				}
+			}
 
 			if (this.nextBackgroundRenderer.transform.position.x <= 0.0f) {
 				if (this.currPhrase != null) {
@@ -355,9 +479,9 @@ public class LevelLoader : MonoBehaviour {
 			currIrisPosition.x += transitionSpeed;
 			this.irisRenderer.transform.position = currIrisPosition;
 
-			if (this.irisRenderer.transform.position.x >= this.enemyAndItemInitPosition.x) {
+			if (this.irisRenderer.transform.position.x >= this.enemyAndItemAndStarInitPosition.x) {
 				this.irisRenderer.transform.position = this.irisInitPosition;
-				this.enemyAndItemRenderer.transform.position = this.enemyAndItemInitPosition;
+				this.enemyAndItemRenderer.transform.position = this.enemyAndItemAndStarInitPosition;
 				this.currBackgroundRenderer.transform.position = this.currBackgroundInitPosition;
 				this.nextBackgroundRenderer.transform.position = this.nextBackgroundInitPosition;
 				LevelLoader.currLevel += 1;
@@ -372,8 +496,8 @@ public class LevelLoader : MonoBehaviour {
 	}
 
 	private void HintVideoEndReached(UnityEngine.Video.VideoPlayer vp) {
-		vp.Stop();
-		hintVideoRenderer.SetActive(false);
+		vp.Pause();
+//		hintVideoRenderer.SetActive(false);
 	}
 
 	private string PhraseChooser() {
